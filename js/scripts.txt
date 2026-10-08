@@ -1,0 +1,121 @@
+// ===== Mobile Navigation =====
+const hamburger = document.querySelector('.hamburger');
+const navLinks = document.querySelector('.nav-links');
+
+hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active');
+    navLinks.classList.toggle('active');
+});
+
+// Close menu when a link is clicked
+document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => {
+        hamburger.classList.remove('active');
+        navLinks.classList.remove('active');
+    });
+});
+
+// ===== Navbar shadow on scroll =====
+const navbar = document.querySelector('.navbar');
+
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 10) {
+        navbar.classList.add('scrolled');
+    } else {
+        navbar.classList.remove('scrolled');
+    }
+});
+
+// ===== Scroll animations =====
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+        }
+    });
+}, observerOptions);
+
+// Add fade-in class to sections and observe
+document.querySelectorAll('section > .container').forEach(el => {
+    el.classList.add('fade-in');
+    observer.observe(el);
+});
+
+// ===== Active nav link on scroll =====
+const sections = document.querySelectorAll('section[id]');
+const navItems = document.querySelectorAll('.nav-links a');
+
+window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop - 100;
+        if (window.scrollY >= sectionTop) {
+            current = section.getAttribute('id');
+        }
+    });
+
+    navItems.forEach(item => {
+        item.style.color = '';
+        if (item.getAttribute('href') === `#${current}`) {
+            item.style.color = 'var(--primary)';
+        }
+    });
+});
+
+// Recalculate open item height on window resize
+window.addEventListener('resize', () => {
+    document.querySelectorAll('.experience-item.open .experience-body')
+        .forEach(body => {
+            body.style.maxHeight = body.scrollHeight + 'px';
+        });
+});
+
+// Open the first item by default (optional)
+if (experienceItems.length > 0) {
+    const first = experienceItems[0];
+    first.classList.add('open');
+    const firstBody = first.querySelector('.experience-body');
+    firstBody.style.maxHeight = firstBody.scrollHeight + 'px';
+    first.querySelector('.experience-header').setAttribute('aria-expanded', 'true');
+}
+
+
+// ===== Collapsible Experience Items =====
+const experienceItems = document.querySelectorAll('.experience-item');
+
+experienceItems.forEach(item => {
+    const header = item.querySelector('.experience-header');
+    const body = item.querySelector('.experience-body');
+
+    header.addEventListener('click', () => {
+        const isOpen = item.classList.contains('open');
+
+        // OPTIONAL: close all others (accordion behavior).
+        // Remove this block if you want multiple items open at once.
+        experienceItems.forEach(other => {
+            if (other !== item && other.classList.contains('open')) {
+                other.classList.remove('open');
+                other.querySelector('.experience-body').style.maxHeight = null;
+                other.querySelector('.experience-header')
+                     .setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        // Toggle current item
+        if (isOpen) {
+            item.classList.remove('open');
+            body.style.maxHeight = null;
+            header.setAttribute('aria-expanded', 'false');
+        } else {
+            item.classList.add('open');
+            body.style.maxHeight = body.scrollHeight + 'px';
+            header.setAttribute('aria-expanded', 'true');
+        }
+    });
+});
